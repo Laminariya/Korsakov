@@ -1,0 +1,416 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ChoseOnParameterPanel : MonoBehaviour
+{
+
+    public DubleSlider DubleSliderArea;
+    public DubleSlider DubleSliderPrice;
+    public DubleSlider DubleSliderFloor;
+    public Button b_Show;
+    public Button b_Reset;
+    public Transform PrefabParent;
+    public GameObject CartFlatPrefab;
+
+    public Button b_St;
+    public Button b_2;
+    public Button b_3;
+
+    public Sprite StActive;
+    public Sprite Flat2Active;
+    public Sprite Flat3Active;
+    
+    private Sprite _stNotActive;
+    private Sprite _flat2NotActive;
+    private Sprite _flat3NotActive;
+    
+    public TMP_Text MinArea;
+    public TMP_Text MaxArea;
+    public TMP_Text MinPrice;
+    public TMP_Text MaxPrice;
+    public TMP_Text MinFloor;
+    public TMP_Text MaxFloor;
+    
+    private GameManager _manager;
+    private List<CartFlatPrefab> _cartFlatPrefabs = new List<CartFlatPrefab>();
+    
+    private int _St;
+    private int _2;
+    private int _3;
+    
+    private int _Korpus1;
+    private int _Korpus2;
+    
+    private float _minArea;
+    private float _maxArea;
+    private float _minPrice;
+    private float _maxPrice;
+    private int _minFloor;
+    private int _maxFloor;
+
+    private Coroutine _coroutineShow;
+    
+    public void Init()
+    {
+        _manager = GameManager.instance;
+        b_Show.onClick.AddListener(OnShowClick);
+        b_Reset.onClick.AddListener(OnResetClick);
+        b_St.onClick.AddListener(OnStClick);
+        b_2.onClick.AddListener(On2Click);
+        b_3.onClick.AddListener(On3Click);
+        DubleSliderArea.Action += OnDoubleSliderArea;
+        DubleSliderPrice.Action += OnDoubleSliderPrice;
+        DubleSliderFloor.Action += OnDoubleSliderFloor;
+        _stNotActive = b_St.image.sprite;
+        _flat2NotActive = b_2.image.sprite;
+        _flat3NotActive = b_3.image.sprite;
+        Hide();
+    }
+
+    public void Show()
+    {
+        gameObject.SetActive(true);
+        OnResetClick();
+    }
+
+    public void Hide()
+    {
+        if(_coroutineShow!=null)
+            StopCoroutine(_coroutineShow);
+        gameObject.SetActive(false);
+    }
+
+    public void ShowKorpus1()
+    {
+        Show();
+        _Korpus1 = 1;
+        _Korpus2 = -1;
+        _manager.MessageOffAllLight();
+        _manager.MessageOnHouse(1, 1);
+        _manager.MessageOnHouse(1, 2);
+        _manager.MessageOnHouse(1, 3);
+        _manager.MessageOnHouse(1, 4);
+        _manager.MessageOnHouse(2, 1);
+        _manager.MessageOnHouse(2, 2);
+    }
+
+    public void ShowKorpus2()
+    {
+        Show();
+        _manager.MessageOffAllLight();
+        _manager.MessageOnHouse(3, 1);
+        _manager.MessageOnHouse(3, 2);
+        _manager.MessageOnHouse(3, 3);
+        _manager.MessageOnHouse(3, 4);
+        _manager.MessageOnHouse(3, 5);
+        _manager.MessageOnHouse(4, 1);
+        _manager.MessageOnHouse(4, 2);
+    }
+    
+    private void OnShowClick()
+    {
+        if(_coroutineShow!=null)
+            StopCoroutine(_coroutineShow);
+        _coroutineShow = StartCoroutine(ShowCoroutine());
+    }
+
+    IEnumerator ShowCoroutine()
+    {
+        GameManager.instance.MessageOffAllLight();
+        //Debug.Log(_1 + " " + _2 + " " + _3 + " " + _St);
+        for (int i = 0; i < _cartFlatPrefabs.Count; i++)
+        {
+            Destroy(_cartFlatPrefabs[i].gameObject);
+        }
+
+        _cartFlatPrefabs.Clear();
+
+
+        foreach (var myObject in GameManager.instance.MyData.MyObjects)
+        {
+            if ((myObject.CountRooms == _2
+                 || myObject.CountRooms == _3 || myObject.CountRooms == _St)
+                && myObject.Area <= _maxArea && myObject.Area >= _minArea &&
+                myObject.Price <= _maxPrice && myObject.Price >= _minPrice &&
+                myObject.Floor <= _maxFloor && myObject.Floor >= _minFloor)
+            {
+                CartFlatPrefab cart = Instantiate(CartFlatPrefab, PrefabParent).GetComponent<CartFlatPrefab>();
+                cart.Init(myObject);
+                _cartFlatPrefabs.Add(cart);
+                cart.OnSendMessageOnComPort();
+                // if (myObject.FlatSprite == null)
+                //     yield return StartCoroutine(_manager.createImagePng.LoadSpriteFromUrl(myObject));
+                cart.Image.sprite = myObject.FlatSprite;
+            }
+
+            yield return null;
+        }
+        
+    }
+
+    private void OnResetClick()
+    {
+        if(_coroutineShow!=null)
+            StopCoroutine(_coroutineShow);
+        _St = 0;
+        _2 = -1;
+        _3 = -1;
+        b_St.image.sprite = StActive;
+        b_2.image.sprite = _flat2NotActive;
+        b_3.image.sprite = _flat3NotActive;
+        foreach (var flatPrefab in _cartFlatPrefabs)
+        {
+            Destroy(flatPrefab.gameObject);
+        }
+        _cartFlatPrefabs.Clear();
+        ReloadSliders();
+    }
+
+    private void OnBackClick()
+    {
+        Hide();
+    }
+
+    private void OnStClick()
+    {
+        //Студию вычисляем по myObject.ObjectClass.Studio Если true то студия, если null то нет
+        if (b_St.image.sprite == _stNotActive)
+        {
+            b_St.image.sprite = StActive;
+            _St = 0;
+        }
+        else
+        {
+            b_St.image.sprite = _stNotActive;
+            _St = -1;
+        }
+        ReloadSliders();
+    }
+
+    private void On2Click()
+    {
+        if (b_2.image.sprite == _flat2NotActive)
+        {
+            b_2.image.sprite = Flat2Active;
+            _2 = 2;
+        }
+        else
+        {
+            b_2.image.sprite = _flat2NotActive;
+            _2 = -1;
+        }
+        ReloadSliders();
+        
+    }
+
+    private void On3Click()
+    {
+        if (b_3.image.sprite == _flat3NotActive)
+        {
+            b_3.image.sprite = Flat3Active;
+            _3 = 3;
+        }
+        else
+        {
+            b_3.image.sprite = _flat3NotActive;
+            _3 = -1;
+        }
+        ReloadSliders();
+    }
+    
+     private void OnDoubleSliderArea(float value)
+    {
+        float max = 0;
+        float min = int.MaxValue;
+        foreach (var building in _manager.MyData.Buildings)
+        {
+            foreach (var myObject in building.MyObjects)
+            {
+                if ((myObject.CountRooms == _2 || myObject.CountRooms == _3 ||
+                     myObject.CountRooms == _St)
+                    && myObject.Area > max)
+                {
+                    max = myObject.Area;
+                }
+            }
+
+            foreach (var myObject in building.MyObjects)
+            {
+                if ((myObject.CountRooms == _2 || myObject.CountRooms == _3 ||
+                     myObject.CountRooms == _St)
+                    && myObject.Area < min)
+                {
+                    min = myObject.Area;
+                }
+            }
+        }
+
+        if (min > 1000000000) min = 0;
+
+        float _delta = max - min;
+        _minArea = min + DubleSliderArea.LeftSlider.value * _delta;
+        _maxArea = max - (1 - DubleSliderArea.RightSlider.value) * _delta;
+        string min1Str = Math.Round(min, 1).ToString();
+        string max1Str = Math.Round(max, 1).ToString();
+        string min2Str = Math.Round(_minArea, 1).ToString();
+        string max2Str = Math.Round(_maxArea, 1).ToString();
+        MinArea.text = min2Str;
+        MaxArea.text = max2Str;
+
+        if (min1Str != min2Str || max1Str != max2Str)
+        {
+            //FilterPointArea.Show(Math.Round(_minArea, 1) + "-" + Math.Round(_maxArea, 1) + "м2");
+        }
+        else
+        {
+            //FilterPointArea.Hide();
+        }
+        //ReloadCountFlat();
+        
+        //AreaRect.offsetMax+=Vector2.one;
+        Canvas.ForceUpdateCanvases();
+        //AreaRect.offsetMax-=Vector2.one;
+    }
+
+    private void OnDoubleSliderPrice(float value)
+    {
+        float max = 0;
+        float min = int.MaxValue;
+        foreach (var building in GameManager.instance.MyData.Buildings)
+        {
+            foreach (var myObject in building.MyObjects)
+            {
+                if ((myObject.CountRooms == _2 || myObject.CountRooms == _3 ||
+                     myObject.CountRooms == _St)
+                    && myObject.Price > max)
+                {
+                    max = myObject.Price;
+                }
+            }
+
+            foreach (var myObject in building.MyObjects)
+            {
+                if ((myObject.CountRooms == _2 || myObject.CountRooms == _3 ||
+                     myObject.CountRooms == _St)
+                    && myObject.Price < min)
+                {
+                    min = myObject.Price;
+                }
+            }
+        }
+
+        if (min > 1000000000) min = 0;
+
+        float _delta = max - min;
+        _minPrice = min + DubleSliderPrice.LeftSlider.value * _delta;
+        _maxPrice = max - (1 - DubleSliderPrice.RightSlider.value) * _delta;
+        MinPrice.text = GameManager.instance.GetShortPrice((int)_minPrice) + " " +
+                        _manager.SymvolRuble; //Math.Round(_minPrice, 1).ToString(); //_manager.GetShortPrice()
+        MaxPrice.text = GameManager.instance.GetShortPrice((int)_maxPrice) + " " +
+                        _manager.SymvolRuble; //Math.Round(_maxPrice, 1).ToString(); //_manager.GetShortPrice()
+
+        string min1Str = Math.Round(min, 1).ToString();
+        string max1Str = Math.Round(max, 1).ToString();
+        string min2Str = Math.Round(_minPrice, 1).ToString();
+        string max2Str = Math.Round(_maxPrice, 1).ToString();
+
+        if (min1Str != min2Str || max1Str != max2Str)
+        {
+            // FilterPointPrice.Show(GameManager.Instance.GetShortPrice((int)_minPrice) + "-" +
+            //                     GameManager.Instance.GetShortPrice((int)_maxPrice)  + "Р");
+        }
+        else
+        {
+            //FilterPointPrice.Hide();
+        }
+
+        //PriceRect.offsetMax+=Vector2.one;
+        Canvas.ForceUpdateCanvases();
+        //PriceRect.offsetMax-=Vector2.one;
+    }
+
+    private void OnDoubleSliderFloor(float value)
+    {
+        float max = 0;
+        float min = int.MaxValue;
+        foreach (var building in GameManager.instance.MyData.Buildings)
+        {
+            foreach (var myObject in building.MyObjects)
+            {
+                if ((myObject.CountRooms == _2 || myObject.CountRooms == _3 ||
+                     myObject.CountRooms == _St)
+                    && myObject.Floor > max)
+                {
+                    max = myObject.Floor;
+                }
+            }
+
+            foreach (var myObject in building.MyObjects)
+            {
+                if ((myObject.CountRooms == _2 || myObject.CountRooms == _3 || myObject.CountRooms == _St)
+                    && myObject.Floor < min)
+                {
+                    min = myObject.Floor;
+                }
+            }
+        }
+        
+        if (min > 1000000000) min = 0;
+
+        float _delta = max - min;
+        _minFloor = (int)(min + DubleSliderFloor.LeftSlider.value * _delta);
+        _maxFloor = (int)(max - (1 - DubleSliderFloor.RightSlider.value) * _delta);
+        MinFloor.text = _minFloor.ToString();
+        MaxFloor.text = _maxFloor.ToString();
+        
+        if (_minFloor != (int)min || _maxFloor != (int)max)
+        {
+            //FilterPointFloor.Show(_minFloor + "-" + _maxFloor);
+        }
+        else
+        {
+            //FilterPointFloor.Hide();
+        }
+        
+        //FloorRect.offsetMax+=Vector2.one;
+        Canvas.ForceUpdateCanvases();
+        //FloorRect.offsetMax-=Vector2.one;
+    }
+    
+    public void ReloadSliders()
+    {
+        DubleSliderArea.Init();
+        DubleSliderFloor.Init();
+        DubleSliderPrice.Init();
+        OnDoubleSliderArea(1f);
+        OnDoubleSliderFloor(1f);
+        OnDoubleSliderPrice(1f);
+    }
+
+    private void CheckAllOffButtons()
+    {
+        if (_2 == -1 && _3 == -1 && _St == -1)
+        {
+            _St = 9;
+            _2 = 2;
+            _3 = 3;
+        }
+    }
+
+    private void CheckResetButtons()
+    {
+        if (_2 != -1 && _3 != -1 && _St != -1)
+        {
+            if (b_St.image.color == Color.white && b_2.image.color == Color.white &&
+                b_3.image.color == Color.white) return;
+            _St = -1;
+            _2 = -1;
+            _3 = -1;
+        }
+    }
+
+}
