@@ -91,31 +91,25 @@ public class MainPanel : MonoBehaviour
         }
     }
 
-    public void Show(int floor)
+    public void Show2()
     {
-        foreach (var image in LightSection)
-        {
-            image.enabled = false;
-        }
-        
-        
         _manager.MessageOffAllLight();
         _manager.MessageOnDemo();
     }
 
-    private void ShowChoseOnParametr()
+    public void ShowChoseOnParametr()
     {
         _manager.choseOnParameterPanel.Show();
     }
 
-    private void ShowOsobennosti()
+    public void ShowOsobennosti()
     {
         _manager.osobennostiProekta.Show();
     }
 
-    private void ShowOtdelka()
+    public void ShowOtdelka()
     {
-        
+        _manager.otdelka.Show();
     }
 
     private void ChangeFloor(int floor)

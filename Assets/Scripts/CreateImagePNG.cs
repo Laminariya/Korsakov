@@ -185,7 +185,7 @@ public class CreateImagePNG : MonoBehaviour
             _sprites.Add(_sprite);
         }
     }
-    
+
     //Загрузили с сервера картинку
     public IEnumerator LoadSpriteFromUrl(MyObject myObject)
     {
@@ -222,7 +222,6 @@ public class CreateImagePNG : MonoBehaviour
             }
         }
         
-        yield break;
         if (myObject.UrlFloor == "") yield break;
         
         using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(myObject.UrlFloor))

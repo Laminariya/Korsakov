@@ -56,6 +56,7 @@ public class OsobennostiProekta : MonoBehaviour
     public void Hide()
     {
         gameObject.SetActive(false);
+        GameManager.instance.mainPanel.Show();
     }
 
     private void OnClickOsobennosti(int number)

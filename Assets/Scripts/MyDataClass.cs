@@ -137,11 +137,7 @@ public class MyDataClass : MonoBehaviour
 
 
         _manager.MyData = _myData;
-
-        foreach (var myFloor in _myData.MyObjects)
-        {
-            Debug.Log(myFloor.CountRooms);
-        }
+        
     }
 
 }
@@ -205,6 +201,7 @@ public class MyObject
     public float CeilingHeight; //Находиться в Билдинге
     public int Number;
     public int NumberInSection;
+    public int NumberLight;
     public int Price;
     public int? CountRooms;
     public int Id;
@@ -290,9 +287,19 @@ public class MyObject
                 NumberInSection = Number - 274 + 5;
             }
         }
+    }
 
+    public IEnumerator LoadSprites()
+    {
         FlatSprite = Resources.Load<Sprite>("Flat/" + Korpus + "_" + Section + "_" + NumberInSection + "_" + Number);
         FloorSprite = Resources.Load<Sprite>("Floor/" + Korpus + "_" + Section + "_" + NumberInSection + "_" + Number);
+
+        if (FlatSprite == null)
+        {
+            //Грузим с сайта
+            yield return GameManager.instance.createImagePNG.LoadSpriteFromUrl(this);
+        }
+        yield return null;
     }
 
 }

@@ -46,7 +46,7 @@ public class ChosenPanel : MonoBehaviour
                                 {
                                     buttons[j].GetComponent<ButtonChoseFlat>().Init(myObject);
                                     isTrue = true;
-                                    Debug.Log((i+1).ToString() +" "+ myObject.NumberInSection);
+                                    //Debug.Log((i+1).ToString() +" "+ myObject.NumberInSection);
                                     break;
                                 }
                             }
@@ -54,7 +54,7 @@ public class ChosenPanel : MonoBehaviour
                             if (isTrue == false)
                             {
                                 buttons[j].GetComponent<ButtonChoseFlat>().Init(null);
-                                Debug.Log("Null" + (i + 1).ToString() + " " + (j + 1));
+                                //Debug.Log("Null" + (i + 1).ToString() + " " + (j + 1));
                             }
                         }
                     }
@@ -77,6 +77,7 @@ public class ChosenPanel : MonoBehaviour
     public void Hide()
     {
         gameObject.SetActive(false);
+        GameManager.instance.mainPanel.Show();
     }
 
     public void OnKorpus2Clicked()

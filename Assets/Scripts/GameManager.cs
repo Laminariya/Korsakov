@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public FlatPanel flatPanel;
     [HideInInspector] public ChosenPanel chosenPanel;
     [HideInInspector] public OsobennostiProekta osobennostiProekta;
+    [HideInInspector] public Otdelka otdelka;
+    [HideInInspector] public CreateImagePNG createImagePNG;
 
     public GameObject loadPanel;
     public TMP_Text InfoStartPanel;
@@ -65,6 +67,9 @@ public class GameManager : MonoBehaviour
         flatPanel = FindObjectOfType<FlatPanel>(true);
         chosenPanel = FindObjectOfType<ChosenPanel>(true);
         osobennostiProekta = FindObjectOfType<OsobennostiProekta>(true);
+        otdelka = FindObjectOfType<Otdelka>(true);
+        createImagePNG = FindObjectOfType<CreateImagePNG>(true);
+        
         
         InfoStartPanel.text += "Load Feed2..."+"\r\n";
         await serializeXML.Init(this);
@@ -78,50 +83,31 @@ public class GameManager : MonoBehaviour
         flatPanel.Init();
         chosenPanel.Init();
         osobennostiProekta.Init();
+        otdelka.Init();
         
         Debug.Log("XXX");
         StartCoroutine(StartGame());
-        Debug.Log("XXX2");
-        InfoStartPanel.text += "Load Feed7..."+"\r\n";
-        // int countFlat = 0;
-        // int countFloor = 0;
-        // foreach (var building in MyData.Buildings)
-        // {
-        //     foreach (var myObject in building.MyObjects)
-        //     {
-        //         if (myObject.Number == 113)
-        //         {
-        //             Debug.Log(myObject.ObjectClass.FloorNumber);
-        //             Debug.Log(myObject.ObjectClass.TotalArea);
-        //             Debug.Log(myObject.ObjectClass.BargainTerms.Price);
-        //         }
-        //     }
-        // }
-        
-        
-        loadPanel.SetActive(false);
-        bluetoothManager.MenuPanel.SetActive(true);
-        bluetoothManager.GetPairedDevices();
-        InfoStartPanel.text += "Load Feed8..."+"\r\n";
-
-        foreach (var myBuilding in MyData.Buildings)
-        {
-            foreach (var mySection in myBuilding.MySections)
-            {
-                Debug.Log("Section: "+mySection.Number);
-            }
-        }
     }
+    
+    
 
     IEnumerator StartGame()
     {
         
         Debug.Log("Load Panel");
-        //yield return StartCoroutine(myDataClass.CreateSprites());
-        
-        //StartButton.SetActive(true);
+        string str = InfoStartPanel.text;
+        int i = 0;
+        foreach (var myObject in MyData.MyObjects)
+        {
+            yield return StartCoroutine(myObject.LoadSprites());
+            i++;
+            InfoStartPanel.text = str + "Load image "+i+"/"+MyData.MyObjects.Count;
+        }
         loadPanel.SetActive(false);
-        yield break;
+        
+        bluetoothManager.MenuPanel.SetActive(true);
+        bluetoothManager.GetPairedDevices();
+        InfoStartPanel.text += "Load Feed8..."+"\r\n";
     }
 
     public string GetSplitPrice(int price)
