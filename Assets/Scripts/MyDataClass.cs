@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 public class MyDataClass : MonoBehaviour
@@ -241,26 +240,31 @@ public class MyObject
             {
                 Section = 1;
                 NumberInSection = Number;
+                NumberLight = Number - 11;
             }
             else if (Number <= 196)
             {
                 Section = 2;
                 NumberInSection = Number - 102;
+                NumberLight = NumberInSection-10+100;
             }
             else if (Number <= 298)
             {
                 Section = 3;
                 NumberInSection = Number - 196;
+                NumberLight = NumberInSection - 11 + 200;
             }
             else if (Number <= 392)
             {
                 Section = 4;
                 NumberInSection = Number - 298;
+                NumberLight = NumberInSection - 10 + 300;
             }
             else
             {
                 Section = 5;
                 NumberInSection = Number - 392;
+                NumberLight = NumberInSection - 10 + 400;
             }
         }
 
@@ -270,21 +274,25 @@ public class MyObject
             {
                 Section = 6;
                 NumberInSection = Number;
+                NumberLight = Number - 10 + 500;
             }
             else if (Number <= 188)
             {
                 Section = 7;
                 NumberInSection = Number - 94;
+                NumberLight = NumberInSection - 10 + 600;
             }
             else if (Number <= 272)
             {
                 Section = 8;
                 NumberInSection = Number - 188 + 2;
+                NumberLight = NumberInSection + 700;
             }
             else
             {
                 Section = 9;
                 NumberInSection = Number - 274 + 5;
+                NumberLight = NumberInSection + 800;
             }
         }
     }

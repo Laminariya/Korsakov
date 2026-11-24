@@ -1,10 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class MainPanel : MonoBehaviour
@@ -15,12 +10,15 @@ public class MainPanel : MonoBehaviour
     public List<Image> LightSection = new List<Image>();
     public CardSection CardSection;
     
-    public Button b_ChosePanel;
     public Button b_OpenBLE;
 
     public Button b_Osobennosti;
     public Button b_Otdelka;
     public Button b_ChoseOnParametr;
+
+    public Button b_Korpus1;
+    public Sprite Korpus1Off;
+    public Sprite Korpus1On;
     
     private int _countClick = 0;
     private float _timer = 0;
@@ -31,6 +29,7 @@ public class MainPanel : MonoBehaviour
         b_ChoseOnParametr.onClick.AddListener(ShowChoseOnParametr);
         b_Osobennosti.onClick.AddListener(ShowOsobennosti);
         b_Otdelka.onClick.AddListener(ShowOtdelka);
+        b_Korpus1.onClick.AddListener(OnLightKorpus1);
         CardSection.Init();
         int k = 0;
         foreach (var image in LightSection)
@@ -49,6 +48,9 @@ public class MainPanel : MonoBehaviour
         {
             image.enabled = false;
         }
+        
+        _manager.MessageOffAllLight();
+        _manager.MessageOnDemo();
     }
 
     private void Update()
@@ -75,9 +77,31 @@ public class MainPanel : MonoBehaviour
                 if (mySection.Number == numberSection)
                 {
                     CardSection.Show(mySection);
+                    
+                    _manager.MessageOffAllLight();
+                    for (int i = 1; i < 9; i++)
+                    {
+                        _manager.MessageOnFloor(2, mySection.Number, i);
+                    }
                     return;
                 }
             }
+        }
+    }
+
+    private void OnLightKorpus1()
+    {
+        if (b_Korpus1.image.sprite == Korpus1Off)
+        {
+            b_Korpus1.image.sprite = Korpus1On;
+            _manager.MessageOffAllLight();
+            _manager.MessageOnHouse(1,1);
+        }
+        else
+        {
+            b_Korpus1.image.sprite = Korpus1Off;
+            _manager.MessageOffAllLight();
+            _manager.MessageOnDemo();
         }
     }
 
@@ -91,12 +115,6 @@ public class MainPanel : MonoBehaviour
         }
     }
 
-    public void Show2()
-    {
-        _manager.MessageOffAllLight();
-        _manager.MessageOnDemo();
-    }
-
     public void ShowChoseOnParametr()
     {
         _manager.choseOnParameterPanel.Show();
@@ -105,28 +123,14 @@ public class MainPanel : MonoBehaviour
     public void ShowOsobennosti()
     {
         _manager.osobennostiProekta.Show();
+        _manager.MessageOnDemo();
     }
 
     public void ShowOtdelka()
     {
         _manager.otdelka.Show();
+        _manager.MessageOnDemo();
     }
-
-    private void ChangeFloor(int floor)
-    {
-        
-        
-        _manager.MessageOffAllLight();
-        _manager.MessageOnFloor(1,1,floor+1);
-    }
-
-    private void OnLightKorpus()
-    {
-
-        _manager.MessageOffAllLight();
-        return;
-        
-        _manager.MessageOnHouse(1, 1);
-    }
+    
 
 }

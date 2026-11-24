@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,6 +49,9 @@ public class FlatPanel : MonoBehaviour
         UpKorpus.text = "Корпус " + _myObject.Korpus.ToString();
         UpFloor.text = "Этаж " + myObject.Floor.ToString();
         OnFlat();
+        
+        GameManager.instance.MessageOffAllLight();
+        GameManager.instance.MessageOnFlat(2, _myObject.Section, _myObject.NumberLight);
     }
 
     public void Hide()

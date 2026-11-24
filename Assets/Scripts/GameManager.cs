@@ -1,10 +1,7 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
@@ -144,7 +141,7 @@ public class GameManager : MonoBehaviour
         str += por;
         if (isOn) str += "0300000000";
         else str += "0000000000";
-        Debug.Log("Mess House");
+        Debug.Log("Mess House " + house);
         bluetoothManager.AddMessage(str);
     }
 
@@ -169,16 +166,16 @@ public class GameManager : MonoBehaviour
 
     public void MessageOnFloor(int house, int porch, int floor)
     {
-        if (floor == 0)
-        {
-            bluetoothManager.AddMessage("010A020E00000100");
-            return;
-        }
-        if (floor == 1)
-        {
-            bluetoothManager.AddMessage("010A020E00000200");
-            return;
-        }
+        // if (floor == 0)
+        // {
+        //     bluetoothManager.AddMessage("010A020E00000100");
+        //     return;
+        // }
+        // if (floor == 1)
+        // {
+        //     bluetoothManager.AddMessage("010A020E00000200");
+        //     return;
+        // }
 
         //HH03SSXX03000000
         string str = house.ToString("X");
